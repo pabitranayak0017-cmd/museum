@@ -687,7 +687,8 @@
             🎵 <span id="audio-status">Play Music</span>
         </button>
         <audio id="bg-audio" loop preload="auto">
-            <source src="assets/audio/pp.mpeg" type="audio/MPEG">
+            <source src="assets/audio/pp.mpeg" type="audio/mpeg">
+            <source src="assets/audio/pp.mp3" type="audio/mpeg">
         </audio>
     </div>
 
@@ -946,7 +947,7 @@
                     </div>
                 </div>
 
-                <!-- Voice Note Player Pill (.ogg audio & Munu loves Khushi title) -->
+                <!-- Voice Note Player Pill -->
                 <div id="voice-pill-card" class="voice-pill-player">
                     <button id="voice-memo-toggle" class="voice-play-btn" aria-label="Play Voice Memo">
                         <span id="voice-play-icon">▶</span>
@@ -1053,7 +1054,7 @@
                 </div>
 
                 <div class="gallery-footer-text">
-                    Made with <span class="heart">❤️</span> at <strong>OurMoments</strong> | <a href="#how">#MUNSHI</a>
+                    Made with <span class="heart">❤️</span> at <strong>OurMoments</strong> | <a href="#how">How it works</a>
                 </div>
             </div>
         </section>
@@ -1075,22 +1076,32 @@
     </main>
 
     <script>
-        // Audio Player Module
+        // Global Audio Helper to bypass browser autoplay restrictions on first user click/touch
         const AudioPlayer = (() => {
             let started = false;
             const playBgMusic = () => {
-                if (started) return;
                 const audio = document.getElementById('bg-audio');
                 const status = document.getElementById('audio-status');
                 if (audio) {
                     audio.play().then(() => {
                         started = true;
                         if (status) status.textContent = 'Pause Music';
-                    }).catch(err => { console.log("Audio autoplay restricted"); });
+                    }).catch(err => {
+                        console.log("Browser blocked initial play until user click.");
+                    });
                 }
             };
             return { playBgMusic };
         })();
+
+        // Global User Interaction Listener for Autoplay Unlocking
+        const unlockAudioOnUserTouch = () => {
+            AudioPlayer.playBgMusic();
+            window.removeEventListener('click', unlockAudioOnUserTouch);
+            window.removeEventListener('touchstart', unlockAudioOnUserTouch);
+        };
+        window.addEventListener('click', unlockAudioOnUserTouch);
+        window.addEventListener('touchstart', unlockAudioOnUserTouch);
 
         // Falling Background Particles
         const BackgroundParticles = (() => {
@@ -1657,7 +1668,6 @@
                 if (waveInterval) clearInterval(waveInterval);
                 waveInterval = setInterval(() => {
                     bars.forEach(bar => {
-                        const base = parseInt(bar.getAttribute('data-base') || '6');
                         const randomHeight = Math.floor(Math.random() * 16) + 4;
                         bar.style.height = `${randomHeight}px`;
                     });
