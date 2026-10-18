@@ -1075,7 +1075,7 @@
     </main>
 
     <script>
-        // Global Audio Helper to bypass browser autoplay restrictions on first user click/touch
+        // Global Audio Helper to bypass browser autoplay restrictions
         const AudioPlayer = (() => {
             let started = false;
             const playBgMusic = () => {
@@ -1154,7 +1154,7 @@
             return { init, nextScene, restartExperience, getCurrentScene: () => currentSceneIndex };
         })();
 
-        // Intro Scene Mechanics
+        // Intro Scene Mechanics - Arrow Shoot & Audio Triggering
         const Intro = (() => {
             let isDragging = false, startY = 0;
             const maxPull = 70;
@@ -1165,7 +1165,6 @@
                 if (!bowArea || !arrow || !heart) return;
 
                 const handleStart = (e) => {
-                    AudioPlayer.playBgMusic();
                     isDragging = true;
                     startY = e.touches ? e.touches[0].clientY : e.clientY;
                 };
@@ -1180,6 +1179,10 @@
                 const handleEnd = () => {
                     if (!isDragging) return;
                     isDragging = false;
+
+                    // Play PP.mpeg music when bow arrow release triggers
+                    AudioPlayer.playBgMusic();
+
                     const arrowRect = arrow.getBoundingClientRect();
                     const heartRect = heart.getBoundingClientRect();
                     const deltaX = (heartRect.left + heartRect.width / 2) - (arrowRect.left + arrowRect.width / 2);
